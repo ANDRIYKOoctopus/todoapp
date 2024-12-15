@@ -1,0 +1,78 @@
+use std::io::{self, Write};
+
+#[derive(Debug)]
+struct Task {
+    name: String,
+}
+
+impl Task {
+    fn new(name: String) -> Self {
+        Task { name }
+    }
+}
+
+struct TodoList {
+    tasks: Vec<Task>,
+}
+
+impl TodoList {
+    fn new() -> Self {
+        TodoList { tasks: Vec::new() }
+    }
+
+    fn add_task(&mut self, task: Task) {
+        self.tasks.push(task);
+    }
+
+    fn remove_task(&mut self, index: usize) {
+        if index < self.tasks.len() {
+            self.tasks.remove(index);
+        }
+    }
+
+    fn display_tasks(&self) {
+        if self.tasks.is_empty() {
+            println!("No tasks found!");
+        } else {
+            for (i, task) in self.tasks.iter().enumerate() {
+                println!("{}: {}", i + 1, task.name);
+            }
+        }
+    }
+}
+
+fn main() {
+    let mut todo_list = TodoList::new();
+    loop {
+        println!("1. Add Task");
+        println!("2. Remove Task");
+        println!("3. Show Tasks");
+        println!("4. Exit");
+
+        let mut choice = String::new();
+        io::stdout().flush().unwrap();
+        io::stdin().read_line(&mut choice).unwrap();
+        let choice: u32 = choice.trim().parse().unwrap();
+
+        match choice {
+            1 => {
+                println!("Enter task name: ");
+                let mut task_name = String::new();
+                io::stdin().read_line(&mut task_name).unwrap();
+                let task = Task::new(task_name.trim().to_string());
+                todo_list.add_task(task);
+            }
+            2 => {
+                todo_list.display_tasks();
+                println!("Enter task number to remove: ");
+                let mut task_number = String::new();
+                io::stdin().read_line(&mut task_number).unwrap();
+                let task_number: usize = task_number.trim().parse().unwrap();
+                todo_list.remove_task(task_number - 1);
+            }
+            3 => todo_list.display_tasks(),
+            4 => break,
+            _ => println!("Invalid choice, please try again."),
+        }
+    }
+}
